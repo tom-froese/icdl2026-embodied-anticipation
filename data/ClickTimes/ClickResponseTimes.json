@@ -1,0 +1,90 @@
+{
+    "Name": "Perceptual Crossing Experiment - Click Response Times",
+    "Description": "First button-press response times extracted from perceptual crossing experiment trials. Each row represents one participant's response in one trial. Trials last 60 seconds. If no click was recorded within the trial, ClickTime_s is NaN and Clicked is 0.",
+    "Columns": [
+        "DyadID",
+        "ParticipantID",
+        "TrialNum",
+        "ClickTime_s",
+        "Clicked"
+    ],
+    "DyadID": {
+        "LongName": "Dyad Identifier",
+        "Description": "Numeric identifier for the experimental dyad. Extracted from the pce folder name (e.g., pce01230807 -> Dyad 1)."
+    },
+    "ParticipantID": {
+        "LongName": "Participant Identifier",
+        "Description": "Participant number within the dyad. 1 = button0 column in raw data; 2 = button1 column."
+    },
+    "TrialNum": {
+        "LongName": "Trial Number",
+        "Description": "Trial number within the session (1-18). Parsed from the CSV filename."
+    },
+    "ClickTime_s": {
+        "LongName": "Click Response Time",
+        "Description": "Timestamp (in seconds from trial onset) of the participant's first button press. NaN if no click was recorded during the trial.",
+        "Units": "s"
+    },
+    "Clicked": {
+        "LongName": "Click Detected",
+        "Description": "Binary flag indicating whether a button press was detected within the trial.",
+        "Levels": {
+            "x0": "No click detected (missed trial)",
+            "x1": "Click detected"
+        }
+    },
+    "SourceData": {
+        "Description": "Raw CSV trial recordings from perceptual crossing experiment.",
+        "FileFormat": ".csv",
+        "TrialDuration": 60,
+        "TrialDurationUnit": "s",
+        "TrialsPerDyad": 18,
+        "ParticipantsPerDyad": 2,
+        "FolderStructure": "pceXXYYMMDD/trials/pair_XX_trial_Y.csv",
+        "RawColumns": [
+            "index",
+            "timestamp",
+            "static_object_0",
+            "static_object_1",
+            "motor_0_vibrate_software",
+            "motor_1_vibrate_software",
+            "pos0",
+            "button0",
+            "shadow_delta0",
+            "pos1",
+            "button1",
+            "shadow_delta1"
+        ],
+        "ButtonMapping": {
+            "button0": "Participant 1 response",
+            "button1": "Participant 2 response"
+        }
+    },
+    "ExtractionMethod": {
+        "Description": "For each trial CSV, the script finds the first row where buttonX == 1 and records the corresponding timestamp value. If no row satisfies this condition, the click time is set to NaN.",
+        "Steps": [
+            "1. Read trial CSV with readtable()",
+            "2. Locate first occurrence of button0 == 1 (P1)",
+            "3. Locate first occurrence of button1 == 1 (P2)",
+            "4. Record timestamp at first-click index, or NaN if absent"
+        ]
+    },
+    "DataSummary": {
+        "NumDyads": 32,
+        "NumTrialFilesProcessed": 576,
+        "TotalClicksDetected": 1030,
+        "TotalClicksMissed": 122,
+        "ClickRate": 0.89409722222222221,
+        "MeanClickTime_s": 30.612565019668,
+        "StdClickTime_s": 14.066800787785807,
+        "MedianClickTime_s": 29.941500056999757,
+        "MinClickTime_s": 0,
+        "MaxClickTime_s": 59.804042087998823,
+        "IQRClickTime_s": 22.075293944002624
+    },
+    "GeneratedBy": {
+        "Name": "preprocessClicks.m",
+        "Description": "MATLAB preprocessing script for PCE click response-time extraction.",
+        "GenerationDateTime": "2026-02-27T19:56:16"
+    }
+}

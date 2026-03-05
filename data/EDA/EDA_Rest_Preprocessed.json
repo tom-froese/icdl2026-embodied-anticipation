@@ -1,0 +1,109 @@
+{
+    "Name": "Perceptual Crossing Experiment - EDA Rest Condition (Preprocessed)",
+    "Description": "Preprocessed electrodermal activity (EDA) data from rest periods of a perceptual coupling experiment. Each rest period is 180 seconds. Data are organized in long format with one row per sample per period.",
+    "SamplingFrequency": 25,
+    "SamplingFrequencyUnit": "Hz",
+    "StartTime": 0,
+    "Columns": [
+        "DyadID",
+        "ParticipantID",
+        "RestNum",
+        "Time_s",
+        "EDA_uS",
+        "ArtifactFlag"
+    ],
+    "DyadID": {
+        "LongName": "Dyad Identifier",
+        "Description": "Numeric identifier for the experimental dyad (pair of participants). Extracted from the first two digits of the pce folder name."
+    },
+    "ParticipantID": {
+        "LongName": "Participant Identifier",
+        "Description": "Participant number within the dyad (1 or 2)."
+    },
+    "RestNum": {
+        "LongName": "Rest Period Number",
+        "Description": "Rest period number within the session (1-4)."
+    },
+    "Time_s": {
+        "LongName": "Time",
+        "Description": "Elapsed time from the start of the rest period.",
+        "Units": "s"
+    },
+    "EDA_uS": {
+        "LongName": "Electrodermal Activity",
+        "Description": "Skin conductance level after low-pass filtering and downsampling. No baseline correction or tonic/phasic decomposition applied.",
+        "Units": "uS"
+    },
+    "ArtifactFlag": {
+        "LongName": "Artifact Flag",
+        "Description": "Binary flag indicating samples that failed physiological plausibility checks. 0 = clean, 1 = flagged. Flagged samples are retained in the data for transparency; downstream exclusion decisions are left to the analyst.",
+        "Levels": {
+            "x0": "Clean sample",
+            "x1": "Artifact detected"
+        }
+    },
+    "SourceData": {
+        "Description": "Raw EDA recordings from perceptual coupling experiment.",
+        "OriginalSamplingFrequency": 1000,
+        "OriginalSamplingFrequencyUnit": "Hz",
+        "FileFormat": ".mat (MATLAB)",
+        "RestDuration": 180,
+        "RestDurationUnit": "s",
+        "RestPeriodsPerParticipant": 4,
+        "ParticipantsPerDyad": 2,
+        "RecordingDevice": "Standard skin conductance electrodes"
+    },
+    "Preprocessing": {
+        "Description": "Standard EDA preprocessing pipeline following SPR publication recommendations.",
+        "Steps": [
+            "1. Zero-phase low-pass Butterworth filter (filtfilt)",
+            "2. Downsampling by decimation (every Nth sample)",
+            "3. Artifact detection via range and gradient checks"
+        ],
+        "LowPassFilter": {
+            "Type": "Butterworth",
+            "Order": 4,
+            "CutoffFrequency": 5,
+            "CutoffFrequencyUnit": "Hz",
+            "Implementation": "Zero-phase (MATLAB filtfilt)",
+            "Rationale": "Standard recommendation for EDA: removes high-frequency noise, EMG artifacts, and mains interference while preserving all physiologically relevant EDA dynamics (Boucsein et al., 2012; Bach et al., 2013)."
+        },
+        "Downsampling": {
+            "OriginalRate": 1000,
+            "TargetRate": 25,
+            "Factor": 40,
+            "Method": "Decimation (every Nth sample after anti-alias filtering)",
+            "Rationale": "25 Hz exceeds Nyquist for 5 Hz low-pass filtered signal. Preserves full signal fidelity with 40x data reduction."
+        },
+        "ArtifactDetection": {
+            "Method": "Combined range and gradient check",
+            "RangeMin": 0.01,
+            "RangeMax": 100,
+            "RangeUnit": "uS",
+            "GradientThreshold": 10,
+            "GradientUnit": "uS/s",
+            "Action": "Flag only (no removal or interpolation)"
+        }
+    },
+    "References": [
+        "Boucsein, W., Fowles, D.C., Grimnes, S., Ben-Shakhar, G., Roth, W.T., Dawson, M.E., & Filion, D.L. (2012). Publication recommendations for electrodermal measurements. Psychophysiology, 49(8), 1017-1034.",
+        "Braithwaite, J.J., Watson, D.G., Jones, R., & Rowe, M. (2013). A guide for analysing electrodermal activity (EDA) & skin conductance responses (SCRs) for psychological experiments. Psychophysiology, 49, 1017-1034.",
+        "Bach, D.R., Flandin, G., Friston, K.J., & Dolan, R.J. (2013). An improved algorithm for model-based analysis of evoked skin conductance responses. Biological Psychology, 94(3), 490-497."
+    ],
+    "DataSummary": {
+        "NumDyads": 31,
+        "NumPeriodsLoaded": 240,
+        "NumPeriodsSkipped": 8,
+        "SamplesPerPeriod": 4500,
+        "TotalSamples": 1.08E+6,
+        "TotalArtifactsFlagged": 0,
+        "ArtifactRate": 0,
+        "MeanEDA_uS": 5.7563570174087113,
+        "StdEDA_uS": 2.9112045286980481
+    },
+    "GeneratedBy": {
+        "Name": "preprocessEDA.m",
+        "Description": "MATLAB preprocessing script for PCE EDA data.",
+        "GenerationDateTime": "2026-02-19T12:00:13"
+    }
+}
