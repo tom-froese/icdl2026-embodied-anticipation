@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the paper below."
+title: "Embodied Temporal Anticipation in Perceptual Crossing"
+type: software
+authors:
+  - family-names: Froese
+    given-names: Tom
+    orcid: "https://orcid.org/0000-0002-9899-5274"
+    affiliation: "Embodied Cognitive Science Unit, Okinawa Institute of Science and Technology (OIST)"
+repository-code: "https://github.com/tom-froese/icdl2026-embodied-anticipation"
+license: MIT
+preferred-citation:
+  type: conference-paper
+  title: "Embodied Temporal Anticipation Without Clocks: Poisson Process Dynamics in Perceptual Crossing"
+  authors:
+    - family-names: Froese
+      given-names: Tom
+      orcid: "https://orcid.org/0000-0002-9899-5274"
+  collection-title: "Proceedings of the 2026 IEEE International Conference on Development and Learning (ICDL)"
+  year: 2026
+  publisher:
+    name: IEEE
