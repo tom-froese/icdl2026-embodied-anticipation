@@ -11,7 +11,7 @@ Companion code and preprocessed data for:
 
 > **Journal paper (IEEE TCDS, in preparation):**
 > [Title TBD — extends the conference paper with haptic feedback, PAS ratings, and EEG coherence analyses.]
-> Tom Froese, Dini Putri. ECSU, OIST, Japan.
+> Tom Froese, et al., ECSU, OIST, Japan.
 
 ## Overview
 
