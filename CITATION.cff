@@ -11,7 +11,7 @@ repository-code: "https://github.com/tom-froese/icdl2026-embodied-anticipation"
 license: MIT
 preferred-citation:
   type: conference-paper
-  title: "Embodied Temporal Anticipation Without Clocks: Poisson Process Dynamics in Perceptual Crossing"
+  title: "Embodied temporal anticipation: Stochastic processes approximate optimal waiting strategies in a social decision-making task"
   authors:
     - family-names: Froese
       given-names: Tom
