@@ -102,12 +102,22 @@ The `code/preprocessing/` scripts document the full pipeline from raw experiment
 
 ## Raw Data
 
-The raw experimental data were collected using the open-source Perceptual Crossing Experiment (PCE) platform described in:
+The raw experimental data were collected using the open-source Perceptual Crossing Experiment (PCE) device described in:
 
-- Lenay, C. et al. (2021). Perceptual crossing device.
-- Lerique, S. et al. (2024). The ECS-UPCE Dataset.
+```bibtex
+@article{estelle2024opensource,
+  title     = {An open-source perceptual crossing device for investigating brain dynamics during human interaction},
+  author    = {Estelle, S. and Uhlig, K. and Zapata-Fonseca, L. and Lerique, S. and Morrissey, B. and Sato, R. and Froese, T.},
+  journal   = {PLoS ONE},
+  volume    = {19},
+  number    = {6},
+  pages     = {e0305283},
+  year      = {2024},
+  doi       = {10.1371/journal.pone.0305283}
+}
+```
 
-Access to the raw dataset can be arranged by contacting the corresponding author.
+Links to the full raw dataset and the accompanying technical report are available at [Lerique et al. (2024)](https://osf.io/preprints/osf/6hjfy_v1).
 
 ## Citation
 
@@ -115,10 +125,10 @@ If you use this code or data, please cite:
 
 ```bibtex
 @inproceedings{froese2026embodied,
-  title     = {Embodied Temporal Anticipation Without Clocks: Poisson Process Dynamics in Perceptual Crossing},
+  title     = {Embodied temporal anticipation: Stochastic processes approximate optimal waiting strategies in a social decision-making task},
   author    = {Froese, Tom},
   booktitle = {Proceedings of the 2026 IEEE International Conference on Development and Learning (ICDL)},
-  year      = {2026},
+  year      = {under review},
   publisher = {IEEE}
 }
 ```
