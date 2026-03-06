@@ -3,13 +3,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MATLAB](https://img.shields.io/badge/MATLAB-R2023b+-blue.svg)](https://www.mathworks.com/products/matlab.html)
 
-Companion code and preprocessed data for the IEEE ICDL 2026 paper:
+Companion code and preprocessed data for the IEEE ICDL 2026 paper (under review):
 
-> **Embodied Temporal Anticipation Without Clocks: Poisson Process Dynamics in Perceptual Crossing**
+> **Embodied temporal anticipation: Stochastic processes approximate optimal waiting strategies in a social decision-making task**
 >
 > Tom Froese
 >
-> Embodied Cognitive Science Unit, Okinawa Institute of Science and Technology (OIST), Japan
+> Embodied Cognitive Science Unit (ECSU), Okinawa Institute of Science and Technology (OIST), Japan
 
 ## Overview
 
