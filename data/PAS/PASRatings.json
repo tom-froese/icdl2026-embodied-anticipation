@@ -1,0 +1,79 @@
+{
+    "Name": "Perceptual Crossing Experiment - PAS Click Presence Ratings",
+    "Description": "Perceptual Awareness Scale (PAS) click-presence ratings extracted from perceptual crossing experiment questionnaires. Each row represents one participant's self-reported awareness rating for one trial. Ratings are only available for trials in which the participant pressed the button.",
+    "Columns": [
+        "DyadID",
+        "ParticipantID",
+        "TrialNum",
+        "ClickPresence"
+    ],
+    "DyadID": {
+        "LongName": "Dyad Identifier",
+        "Description": "Numeric identifier for the experimental dyad. Extracted from the pce folder name (e.g., pce01230807 -> Dyad 1)."
+    },
+    "ParticipantID": {
+        "LongName": "Participant Identifier",
+        "Description": "Participant number within the dyad. Parsed from PAS filename (e.g., pair_01_P1_PAS*.csv -> 1)."
+    },
+    "TrialNum": {
+        "LongName": "Trial Number",
+        "Description": "Trial number within the session (1-18). Converted from 0-indexed trial_id in the raw PAS file."
+    },
+    "ClickPresence": {
+        "LongName": "PAS Click Presence Rating",
+        "Description": "Participant's Perceptual Awareness Scale rating for the clarity of experiencing the partner's presence just before pressing the button. Ordinal scale from 1 to 4.",
+        "Levels": {
+            "x1": "No experience of the other",
+            "x2": "Vague impression of the other",
+            "x3": "Almost clear experience of the other",
+            "x4": "Clear experience of the other"
+        }
+    },
+    "SourceData": {
+        "Description": "PAS questionnaire CSV files from perceptual crossing experiment.",
+        "FileFormat": ".csv",
+        "TrialsPerDyad": 18,
+        "ParticipantsPerDyad": 2,
+        "FolderStructure": "pceXXYYMMDD/questionnaires/pair_XX_PY_PAS*.csv",
+        "RawColumns": [
+            "trial_id",
+            "question_id",
+            "answer"
+        ],
+        "TrialIdIndexing": "0-indexed in raw file; converted to 1-indexed TrialNum"
+    },
+    "ExtractionMethod": {
+        "Description": "Extracts click_presence ratings from PAS questionnaire files and converts from long to wide format.",
+        "Steps": [
+            "1. Discover pce* folders and locate questionnaires/ subfolder",
+            "2. Find *PAS*.csv files and parse DyadID, ParticipantID from filename",
+            "3. Read trial_id, question_id, answer columns",
+            "4. Filter for question_id == 'click_presence'",
+            "5. Convert trial_id + 1 to create 1-indexed TrialNum",
+            "6. Sort by DyadID, ParticipantID, TrialNum and export"
+        ]
+    },
+    "DataSummary": {
+        "NumDyads": 32,
+        "NumPASFilesProcessed": 64,
+        "NumPASFilesSkipped": 0,
+        "TotalRatingsExtracted": 1152,
+        "TotalExpected": 1152,
+        "TotalMissing": 0,
+        "MeanRating": 2.7708333333333335,
+        "StdRating": 1.2201251876349821,
+        "MedianRating": 3,
+        "ModeRating": 3,
+        "RatingDistribution": {
+            "x1_NoExperience": 13,
+            "x2_VagueImpression": 248,
+            "x3_AlmostClear": 393,
+            "x4_ClearExperience": 376
+        }
+    },
+    "GeneratedBy": {
+        "Name": "preprocessPAS.m",
+        "Description": "MATLAB preprocessing script for PCE PAS click-presence extraction.",
+        "GenerationDateTime": "2026-03-06T12:35:42"
+    }
+}

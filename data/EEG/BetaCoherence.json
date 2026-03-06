@@ -1,0 +1,191 @@
+{
+    "Name": "Perceptual Crossing Experiment - Beta-Band EEG Coherence",
+    "Description": "Magnitude-squared coherence (MSC) in the standard beta band (13-30 Hz) computed for two fixed 4-second epochs that bracket the PAS crossover confidence interval: PRE [17-21 s] (sampling phase) and POST [34-38 s] (selection phase). The PAS 4/3 crossover occurs at 27.73 s (95% CI: 21.49-33.39 s); the click-time peak is ~24.4 s. The entire CI window is excluded from both epochs.",
+    "Columns_FullPairs": [
+        "DyadID",
+        "ParticipantID",
+        "TrialNum",
+        "PairIdx",
+        "ChA",
+        "ChB",
+        "Coh_PRE",
+        "Coh_POST"
+    ],
+    "Columns_ROI": [
+        "DyadID",
+        "ParticipantID",
+        "TrialNum",
+        "ROI",
+        "Coh_PRE",
+        "Coh_POST"
+    ],
+    "DyadID": {
+        "LongName": "Dyad Identifier",
+        "Description": "Numeric identifier for the experimental dyad. Parsed from the .mat filename (e.g., pce01_P1_Trial01.mat -> Dyad 1)."
+    },
+    "ParticipantID": {
+        "LongName": "Participant Identifier",
+        "Description": "Participant number within the dyad (1 or 2). Parsed from the .mat filename."
+    },
+    "TrialNum": {
+        "LongName": "Trial Number",
+        "Description": "Trial number within the session (1-18)."
+    },
+    "PairIdx": {
+        "LongName": "Channel Pair Index",
+        "Description": "Index into the 351 unique channel pairs (nchoosek(27,2)). ChA and ChB identify the two electrodes."
+    },
+    "Coh_PRE": {
+        "LongName": "Beta Coherence (PRE epoch)",
+        "Description": "Mean magnitude-squared coherence in the beta band (13-30 Hz) during the PRE epoch [17-21 s].",
+        "Units": "dimensionless (0-1)"
+    },
+    "Coh_POST": {
+        "LongName": "Beta Coherence (POST epoch)",
+        "Description": "Mean magnitude-squared coherence in the beta band (13-30 Hz) during the POST epoch [34-38 s].",
+        "Units": "dimensionless (0-1)"
+    },
+    "Epochs": {
+        "PRE": {
+            "Start_s": 17,
+            "End_s": 21,
+            "Label": "Sampling phase",
+            "Rationale": "4 s immediately before CI lower bound (21.49 s)"
+        },
+        "POST": {
+            "Start_s": 34,
+            "End_s": 38,
+            "Label": "Selection phase",
+            "Rationale": "4 s immediately after CI upper bound (33.39 s)"
+        }
+    },
+    "CrossoverContext": {
+        "CrossoverTime_s": 27.73,
+        "CI_lower_s": 21.49,
+        "CI_upper_s": 33.39,
+        "ClickTimePeak_s": 24.4,
+        "CIWindow_excluded": true,
+        "Source": "plotPASFigures.m"
+    },
+    "FrequencyBand": {
+        "Name": "beta",
+        "Range_Hz": [
+            13,
+            30
+        ]
+    },
+    "SamplingRate_Hz": 1000,
+    "TrialDuration_s": 60,
+    "EpochLength_s": 4,
+    "WelchParameters": {
+        "SegmentLength_s": 1,
+        "OverlapFraction": 0.5,
+        "NumAveragingSegments": 7,
+        "FrequencyResolution_Hz": 1,
+        "WindowFunction": "Hann",
+        "Function": "mscohere (MATLAB)"
+    },
+    "Channels": {
+        "NumSelected": 27,
+        "Labels": [
+            "Fp1",
+            "Fp2",
+            "F7",
+            "F3",
+            "Fz",
+            "F4",
+            "F8",
+            "FC5",
+            "FC1",
+            "FC2",
+            "FC6",
+            "T7",
+            "C3",
+            "Cz",
+            "C4",
+            "T8",
+            "CP5",
+            "CP1",
+            "CP2",
+            "CP6",
+            "P7",
+            "P3",
+            "Pz",
+            "P4",
+            "P8",
+            "O1",
+            "O2"
+        ],
+        "HardwareIndices_1based": [
+            1,
+            32,
+            4,
+            3,
+            2,
+            30,
+            31,
+            6,
+            7,
+            29,
+            28,
+            9,
+            8,
+            24,
+            25,
+            26,
+            11,
+            12,
+            23,
+            22,
+            15,
+            14,
+            13,
+            19,
+            20,
+            16,
+            18
+        ],
+        "NumPairs": 351,
+        "Cap": "Custom 64Ch actiCAP snap (CACS-64-X22)"
+    },
+    "ROIs": {
+        "Names": [
+            "Frontal",
+            "Central",
+            "Parietal",
+            "Left",
+            "Right",
+            "FrontoParietal"
+        ],
+        "Frontal": "Fp1, Fp2, F7, F3, Fz, F4, F8, FC5, FC1, FC2, FC6",
+        "Central": "T7, C3, Cz, C4, T8",
+        "Parietal": "CP5, CP1, CP2, CP6, P7, P3, Pz, P4, P8, O1, O2",
+        "Left": "Fp1, F7, F3, FC5, FC1, T7, C3, CP5, CP1, P7, P3, O1",
+        "Right": "Fp2, F8, F4, FC6, FC2, T8, C4, CP6, CP2, P8, P4, O2",
+        "FrontoParietal": "Cross-region: one Frontal + one Parietal electrode"
+    },
+    "SourceData": {
+        "Description": "Preprocessed EEG .mat files from MNE-Python pipeline. Data from pair 31 are not included in the repository due to incomplete recording caused by a system error.",
+        "FileFormat": ".mat (float32)",
+        "Dimensions": "64 channels x 60000 samples",
+        "FileNaming": "pceXX_P{1,2}_Trial{1-18}.mat",
+        "Preprocessing": "0.1 Hz high-pass, 60 Hz low-pass (zero-phase FIR), spherical spline interpolation of bad channels, ICA artifact removal (30 components, EOG detection via Fp1/Fp2)."
+    },
+    "DataSummary": {
+        "NumDyads": 31,
+        "NumFilesProcessed": 1116,
+        "NumFilesSkipped": 0,
+        "TotalPairRows": 391716,
+        "TotalROIRows": 6696,
+        "ElapsedTime_s": 3789
+    },
+    "GeneratedBy": {
+        "Name": "preprocessEEG.m",
+        "Description": "MATLAB preprocessing script for PCE beta-band EEG coherence.",
+        "GenerationDateTime": "2026-03-06T14:57:30"
+    },
+    "OutputFiles": {
+        "FullPairs": "BetaCoherence.csv",
+        "ROISummary": "BetaCoherence_ROI.csv"
+    }
+}

@@ -1,0 +1,82 @@
+{
+    "Name": "Perceptual Crossing Experiment - Haptic Feedback",
+    "Description": "Haptic feedback (vibration motor activation) time series extracted from perceptual crossing experiment trials. Each row represents one downsampled time point for one participant in one trial. The HapticFeedback column gives the binary state of the vibration motor at each 10 ms time point (0 = off, 1 = on). Trials last 60 seconds.",
+    "SamplingFrequency": 100,
+    "SamplingFrequencyUnit": "Hz",
+    "StartTime": 0,
+    "Columns": [
+        "DyadID",
+        "ParticipantID",
+        "TrialNum",
+        "Time_s",
+        "HapticFeedback"
+    ],
+    "DyadID": {
+        "LongName": "Dyad Identifier",
+        "Description": "Numeric identifier for the experimental dyad (pair number 1-32). Extracted from the pce folder name (e.g., pce01230807 -> pair 01 -> DyadID 1)."
+    },
+    "ParticipantID": {
+        "LongName": "Participant Identifier",
+        "Description": "Participant number within the dyad. 1 = motor_0_vibrate_software, 2 = motor_1_vibrate_software."
+    },
+    "TrialNum": {
+        "LongName": "Trial Number",
+        "Description": "Trial number within the session (1-18)."
+    },
+    "Time_s": {
+        "LongName": "Time",
+        "Description": "Elapsed time from trial onset (bin centre after downsampling).",
+        "Units": "s"
+    },
+    "HapticFeedback": {
+        "LongName": "Haptic Feedback State",
+        "Description": "Binary state of the vibration motor at each downsampled time point (software-triggered). Values are 0 (motor off) or 1 (motor on). Downsampling uses nearest-neighbour decimation: for each output time bin, the raw sample closest to the bin centre is selected, preserving the binary nature of the signal.",
+        "Units": "binary (0 or 1)"
+    },
+    "SourceData": {
+        "Description": "Raw CSV trial recordings from perceptual crossing experiment.",
+        "FileFormat": ".csv",
+        "TrialDuration": 60,
+        "TrialDurationUnit": "s",
+        "TrialsPerDyad": 18,
+        "ParticipantsPerDyad": 2,
+        "FolderStructure": "pceXXYYMMDD/trials/pair_XX_trial_Y.csv",
+        "RawColumns": [
+            "timestamp",
+            "motor_0_vibrate_software",
+            "motor_1_vibrate_software"
+        ],
+        "EstimatedRawSamplingRate_Hz": 601.4,
+        "EstimatedRawSamplingRate_Std": 10.59
+    },
+    "ExtractionMethod": {
+        "Description": "Nearest-neighbour decimation of binary haptic feedback signal.",
+        "Steps": [
+            "1. Discover pce* folders and parse DyadID from folder name",
+            "2. Read each trial CSV (pair_XX_trial_Y.csv)",
+            "3. Extract timestamp, motor_0_vibrate_software, motor_1_vibrate_software",
+            "4. Downsample by nearest-neighbour: select raw sample closest to each bin centre",
+            "5. Target rate: 100 Hz (bin width = 10 ms)",
+            "6. Store one time series per participant per trial",
+            "7. Sort by DyadID, ParticipantID, TrialNum and export"
+        ],
+        "DownsamplingMethod": "Nearest-neighbour decimation (preserves binary values)",
+        "TargetSamplingRate": 100,
+        "TargetSamplingRateUnit": "Hz"
+    },
+    "DataSummary": {
+        "NumDyads": 32,
+        "NumTrialFilesProcessed": 576,
+        "NumTrialFilesSkipped": 0,
+        "NumSegmentsExtracted": 1152,
+        "TotalSamples": 6.910846E+6,
+        "MeanHapticFeedback": 0.34394802082618653,
+        "StdHapticFeedback": 0.14130653457374198,
+        "MedianHapticFeedback": 0.31788631438573095
+    },
+    "GeneratedBy": {
+        "Name": "preprocessHaptics.m",
+        "Description": "MATLAB preprocessing script for PCE haptic feedback data.",
+        "GenerationDateTime": "2026-03-06T11:44:01"
+    }
+}
