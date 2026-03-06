@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this code or data, please cite the paper below."
+message: "If you use this code or data, please cite the paper below (currently under review)."
 title: "Embodied Temporal Anticipation in Perceptual Crossing"
 type: software
 authors:
@@ -16,7 +16,7 @@ preferred-citation:
     - family-names: Froese
       given-names: Tom
       orcid: "https://orcid.org/0000-0002-9899-5274"
-  collection-title: "Proceedings of the 2026 IEEE International Conference on Development and Learning (ICDL)"
-  year: 2026
+  collection-title: "2026 IEEE International Conference on Development and Learning (ICDL)"
+  status: submitted
   publisher:
     name: IEEE
