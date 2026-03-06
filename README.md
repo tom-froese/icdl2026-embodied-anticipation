@@ -102,7 +102,7 @@ The `code/preprocessing/` scripts document the full pipeline from raw experiment
 
 ## Raw Data
 
-The raw experimental data were collected using the open-source Perceptual Crossing Experiment (PCE) device described in:
+The raw experimental data were collected using the open-source Perceptual Crossing Experiment (PCE) device described in [Estelle et al. (2024)](https://doi.org/10.1371/journal.pone.0305283):
 
 ```bibtex
 @article{estelle2024opensource,
