@@ -11,7 +11,7 @@ Companion code and preprocessed data for:
 
 > **Journal paper (IEEE TCDS, in preparation):**
 > [Title TBD — extends the conference paper with haptic feedback, PAS ratings, and EEG coherence analyses.]
-> Tom Froese, et al., ECSU, OIST, Japan.
+> Tom Froese, et al. ECSU, OIST, Japan.
 
 ## Overview
 
@@ -55,7 +55,7 @@ This repository contains preprocessing scripts, analysis code, and preprocessed 
 │   │   ├── ARU_Rest_Preprocessed.csv
 │   │   └── ARU_Rest_Preprocessed.json
 │   ├── Haptics/                        # Preprocessed haptic feedback       [TCDS]
-│   │   ├── HapticFeedback.csv
+│   │   ├── HapticFeedback.csv.gz      # Gzipped — unzip before use
 │   │   └── HapticFeedback.json
 │   ├── PAS/                            # Perceptual Awareness Scale ratings [TCDS]
 │   │   ├── PASRatings.csv
@@ -106,6 +106,9 @@ plotARUFigures
 
 %% --- IEEE TCDS journal figures ---
 
+% First, decompress the haptic feedback data (one-time step):
+%   gunzip('../../data/Haptics/HapticFeedback.csv.gz')
+
 % Figure 5: Haptic feedback grand-average time series
 plotHapticFeedbackFigure
 
@@ -117,6 +120,14 @@ plotEEGFigures
 ```
 
 Output figures are saved to `results/` at 300 dpi.
+
+**Note:** `HapticFeedback.csv` is distributed as `HapticFeedback.csv.gz` (18 MB compressed, 198 MB uncompressed) due to GitHub's 100 MB file size limit. Before running `plotHapticFeedbackFigure.m`, decompress it once:
+
+```matlab
+gunzip('../../data/Haptics/HapticFeedback.csv.gz')
+```
+
+Or from the terminal: `gunzip data/Haptics/HapticFeedback.csv.gz`
 
 ## Data Description
 
@@ -164,7 +175,7 @@ Raw data were collected using the open-source PCE device described in [Estelle e
 
 The EEG coherence analyses build on methods from:
 
-> Putri, D. & Froese, T. (2025). Rapid recognition of haptic feedback as mediated social touch: EEG evidence from the perceptual crossing paradigm. *[Journal TBD]*.
+> Putri, D. & Froese, T. (2025). [Rapid recognition of haptic feedback as mediated social touch is associated with long-term weakened frontoparietal neural coherence](https://www.techrxiv.org/users/946540/articles/1316415-rapid-recognition-of-haptic-feedback-as-mediated-social-touch-is-associated-with-long-term-weakened-frontoparietal-neural-coherence). *TechRxiv* (preprint).
 
 ## Citation
 
