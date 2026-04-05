@@ -133,6 +133,10 @@ If you use this code or data, please cite:
 }
 ```
 
+## Related Repositories
+
+For the extended analysis including EEG global scalp potential, haptic contact, and perceptual awareness (PAS) sensitivity dynamics, see [pce-sensitivity-dynamics](https://github.com/tom-froese/pce-sensitivity-dynamics).
+
 ## License
 
 This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
