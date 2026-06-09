@@ -17,8 +17,8 @@
 %        high-frequency noise (1.0 Hz = 60 br/min, well above
 %        physiological maximum of ~40 br/min)
 %      - NO high-pass filter applied: baseline drift and slow trends
-%        are intentionally preserved as they carry the P(1) dynamics
-%        of theoretical interest (task-dependent respiratory flux)
+%        are intentionally preserved as they carry the S(x) dynamics
+%        of theoretical interest (task-dependent respiratory trend)
 %   2. Downsample: 1000 Hz -> 25 Hz (factor of 40)
 %      - 25 Hz preserves all respiratory information (Nyquist for 1 Hz
 %        content requires >= 2 Hz; 25 Hz provides generous oversampling
@@ -71,7 +71,7 @@ filter_order  = 4;          % Butterworth filter order (4th order = 24 dB/oct)
 lp_cutoff     = 1.0;        % Low-pass cutoff (Hz) - 60 br/min ceiling
                              % NOTE: No high-pass applied. Baseline drift and
                              % slow trends are PRESERVED intentionally, as
-                             % they carry the P(1) dynamics of interest.
+                             % they carry the S(x) dynamics of interest.
 
 % Artifact detection parameters (adaptive thresholds)
 clip_iqr_factor = 3.0;      % Flag amplitudes > median +/- factor*IQR
@@ -88,7 +88,7 @@ rest_samples  = rest_duration * fs_original;    % 180000
 
 %% Design low-pass filter (once, for original sampling rate)
 %  Low-pass only: preserves baseline drift and slow trends that carry
-%  P(1) dynamics. No high-pass is applied.
+%  S(x) dynamics. No high-pass is applied.
 [b_lp, a_lp] = butter(filter_order, lp_cutoff / (fs_original / 2), 'low');
 
 fprintf('==========================================================\n');
@@ -96,7 +96,7 @@ fprintf('  Respiration Preprocessing Script for PCE Experiment\n');
 fprintf('==========================================================\n');
 fprintf('  Low-pass filter: %d-order Butterworth, %.1f Hz cutoff\n', ...
     filter_order, lp_cutoff);
-fprintf('  High-pass:       none (slow trends preserved for P(1) analysis)\n');
+fprintf('  High-pass:       none (slow trends preserved for S(x) analysis)\n');
 fprintf('  Downsampling:    %d Hz -> %d Hz (factor %d)\n', ...
     fs_original, fs_target, downsample_factor);
 fprintf('  Signal inversion: yes (convention: inspiration = positive)\n');
@@ -375,7 +375,7 @@ preproc_doc = struct( ...
         'CutoffUnit', 'Hz', ...
         'Implementation', 'Zero-phase (MATLAB filtfilt)', ...
         'HighPassApplied', false, ...
-        'Rationale', 'Low-pass at 1.0 Hz removes movement artifacts, cardiac contamination, and high-frequency noise while preserving the full respiratory bandwidth (normal adult range: 12-20 br/min = 0.2-0.33 Hz; physiological maximum ~40 br/min = 0.67 Hz). No high-pass filter is applied: baseline drift and slow trends are intentionally preserved as they carry the P(1) dynamics of theoretical interest (task-dependent respiratory flux). Standard low-pass recommendation per Lorig (2012).'), ...
+        'Rationale', 'Low-pass at 1.0 Hz removes movement artifacts, cardiac contamination, and high-frequency noise while preserving the full respiratory bandwidth (normal adult range: 12-20 br/min = 0.2-0.33 Hz; physiological maximum ~40 br/min = 0.67 Hz). No high-pass filter is applied: baseline drift and slow trends are intentionally preserved as they carry the S(x) dynamics of theoretical interest (task-dependent respiratory trend). Standard low-pass recommendation per Lorig (2012).'), ...
     'SignalInversion', struct( ...
         'Applied', true, ...
         'Method', 'Multiply by -1', ...

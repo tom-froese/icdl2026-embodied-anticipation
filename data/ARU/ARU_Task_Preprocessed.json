@@ -70,7 +70,7 @@
             "CutoffUnit": "Hz",
             "Implementation": "Zero-phase (MATLAB filtfilt)",
             "HighPassApplied": false,
-            "Rationale": "Low-pass at 1.0 Hz removes movement artifacts, cardiac contamination, and high-frequency noise while preserving the full respiratory bandwidth (normal adult range: 12-20 br/min = 0.2-0.33 Hz; physiological maximum ~40 br/min = 0.67 Hz). No high-pass filter is applied: baseline drift and slow trends are intentionally preserved as they carry the P(1) dynamics of theoretical interest (task-dependent respiratory flux). Standard low-pass recommendation per Lorig (2012)."
+            "Rationale": "Low-pass at 1.0 Hz removes movement artifacts, cardiac contamination, and high-frequency noise while preserving the full respiratory bandwidth (normal adult range: 12-20 br/min = 0.2-0.33 Hz; physiological maximum ~40 br/min = 0.67 Hz). No high-pass filter is applied: baseline drift and slow trends are intentionally preserved as they carry the S(x) dynamics of theoretical interest (task-dependent respiratory trend). Standard low-pass recommendation per Lorig (2012)."
         },
         "SignalInversion": {
             "Applied": true,
