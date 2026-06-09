@@ -6,7 +6,7 @@
 % Generates three figures sized for IEEE double-column format:
 %
 % FIGURE 1: Rest condition (2 vertically stacked panels)
-%   A. Rest grand average + P(0) fit
+%   A. Rest grand average + R(x) fit
 %   B. Rest residuals with green/red shading and zero crossings
 %
 % FIGURE 2: Onset lag analysis (2 panels, for reference only — not
@@ -14,13 +14,13 @@
 %   A. R² vs. onset lag (both conditions)
 %   B. Free rate vs. e/(60-tau) crossing
 %
-% FIGURE 3: Task condition — optimised P(0) fit (2 vertically stacked panels)
-%   A. Task EDA with P(0) fit at optimal onset lag
+% FIGURE 3: Task condition — optimised R(x) fit (2 vertically stacked panels)
+%   A. Task EDA with R(x) fit at optimal onset lag
 %   B. Residuals of the optimised fit
 %
 % NOTE ON CENTERING:
 %   Unlike respiration (ARU), EDA is not participant-mean-centered before
-%   grand averaging. This is justified because the P(0) model includes a
+%   grand averaging. This is justified because the R(x) model includes a
 %   free tonic baseline parameter B, which absorbs between-participant
 %   differences in absolute EDA level. The two-level aggregation (within-
 %   participant trial averaging, then across-participant grand averaging)
@@ -102,18 +102,18 @@ rest_sem  = std(rest_participant_matrix, 0, 1) / sqrt(n_rest);
 
 fprintf('  Task: N=%d,  Rest: N=%d\n', n_task, n_rest);
 
-%% Fit P(0) models
-fprintf('Fitting P(0) models ...\n');
+%% Fit R(x) models
+fprintf('Fitting R(x) models ...\n');
 
 % --- Rest: full window, lambda=e ---
 x_rest = rest_time / rest_duration;
-[A0_rest, B_rest, R2_rest, RMSE_rest, yfit_rest] = fit_p0_lambda_e(x_rest, rest_mean);
+[A0_rest, B_rest, R2_rest, RMSE_rest, yfit_rest] = fit_reliability_lambda_e(x_rest, rest_mean);
 resid_rest = (rest_mean - yfit_rest) * 1000;  % mµS
 
 % --- Task: full window, lambda=e (no offset) ---
 x_task_full = task_time / task_duration;
 [A0_task_full, B_task_full, R2_task_full, RMSE_task_full, yfit_task_full] = ...
-    fit_p0_lambda_e(x_task_full, task_mean);
+    fit_reliability_lambda_e(x_task_full, task_mean);
 resid_task_full = (task_mean - yfit_task_full) * 1000;
 
 % --- Task: onset lag sweep ---
@@ -125,7 +125,7 @@ A0_task_sweep = NaN(1, n_tau);
 B_task_sweep  = NaN(1, n_tau);
 R2_rest_sweep = NaN(1, n_tau);
 
-p0_model_free = @(params, t) params(1) * exp(-params(2) * t) + params(3);
+reliability_model_free = @(params, t) params(1) * exp(-params(2) * t) + params(3);
 opts = optimoptions('lsqcurvefit', 'Display', 'off', ...
     'MaxIterations', 10000, 'MaxFunctionEvaluations', 30000, ...
     'TolFun', 1e-12, 'TolX', 1e-12);
@@ -143,7 +143,7 @@ for s = 1:n_tau
     idx_t = (tau_samp + 1):task_samples;
     y_t = task_mean(idx_t);
     x_t = (task_time(idx_t) - tau) / T_eff_task;
-    [A0, B, R2, RMSE, ~] = fit_p0_lambda_e(x_t, y_t);
+    [A0, B, R2, RMSE, ~] = fit_reliability_lambda_e(x_t, y_t);
     R2_task_sweep(s) = R2;
     RMSE_task_sweep(s) = RMSE;
     A0_task_sweep(s) = A0;
@@ -156,7 +156,7 @@ for s = 1:n_tau
     B_init = y_t(end);
     p0 = [A0_init, 0.05, B_init];
     lb = [0, 0.0001, 0]; ub = [50, 1, 50];
-    params = lsqcurvefit(p0_model_free, p0, t_clock, y_t, lb, ub, opts);
+    params = lsqcurvefit(reliability_model_free, p0, t_clock, y_t, lb, ub, opts);
     k_free_at_tau(s) = params(2);
     
     % Rest
@@ -165,7 +165,7 @@ for s = 1:n_tau
     idx_r = (tau_samp + 1):rest_samples;
     y_r = rest_mean(idx_r);
     x_r = (rest_time(idx_r) - tau) / T_eff_rest;
-    [~, ~, R2, ~, ~] = fit_p0_lambda_e(x_r, y_r);
+    [~, ~, R2, ~, ~] = fit_reliability_lambda_e(x_r, y_r);
     R2_rest_sweep(s) = R2;
 end
 
@@ -237,7 +237,7 @@ eda_ymin = min([min(rest_mean - rest_sem), min(task_mean - task_sem)]) - 0.1;
 eda_ymax = max([max(rest_mean + rest_sem), max(task_mean + task_sem)]) + 0.1;
 
 %% ========================================================================
-%  FIGURE 1: REST — P(0) Fit and Residuals
+%  FIGURE 1: REST — R(x) Fit and Residuals
 %  ========================================================================
 
 fprintf('Creating Figure 1 (Rest) ...\n');
@@ -371,7 +371,7 @@ print(fig2, '../../results/FigSI_EDA_OnsetLag', '-dpng', '-r600');
 fprintf('  Saved: FigSI_EDA_OnsetLag.png (600 dpi)\n');
 
 %% ========================================================================
-%  FIGURE 3: TASK — Optimised P(0) Fit and Residuals
+%  FIGURE 3: TASK — Optimised R(x) Fit and Residuals
 %  ========================================================================
 
 fprintf('Creating Figure 3 (Task — optimised fit) ...\n');
@@ -396,7 +396,7 @@ fill([task_time, fliplr(task_time)], ...
 % Grand average (full trial)
 plot(task_time, task_mean, '-', 'Color', col_task, 'LineWidth', line_width_data);
 
-% P(0) fit (from tau onward)
+% R(x) fit (from tau onward)
 plot(task_time(idx_opt), yfit_task_opt, '-', 'Color', col_fit, 'LineWidth', line_width_fit);
 
 % Onset lag line
@@ -473,7 +473,7 @@ fprintf('Done.\n');
 %  LOCAL FUNCTIONS
 %  ========================================================================
 
-function [A0, B, R2, RMSE, yfit] = fit_p0_lambda_e(x, y)
+function [A0, B, R2, RMSE, yfit] = fit_reliability_lambda_e(x, y)
     model = @(params, x) params(1) * exp(-exp(1) * x) + params(2);
     A0_init = y(1) - y(end);
     B_init = y(end);

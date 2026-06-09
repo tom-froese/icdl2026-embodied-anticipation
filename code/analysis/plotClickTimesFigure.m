@@ -1,12 +1,12 @@
 %% plotClickTimesFigure.m
 % =========================================================================
-% Publication Figure: Click Response-Time Distribution with P(1) Fit
+% Publication Figure: Click Response-Time Distribution with S(x) Fit
 % =========================================================================
 %
 % Pipeline:
 %   1. Load click response times
 %   2. Estimate smooth density via kernel density estimation (KDE)
-%   3. Fit the Poisson first-order term
+%   3. Fit the rate-sensitivity function S(x)
 %          f(t) = A * e * x * exp(-e*x)
 %      where  x  = (t - tau) / (T - tau),   tau = onset lag,  T = 60 s.
 %      Lambda is fixed at e (Euler's number).  A is estimated by scalar
@@ -15,15 +15,15 @@
 %   4. Select the onset lag tau that maximises R^2 against the KDE
 %      by grid search (0.1 s steps).
 %
-% Rationale for P(1):
-%   EDA conforms to  P(0) = A0 * exp(-e*x) + B0    (the prepared state).
-%   Respiration (ARU) to  P(1) = A1 * e*x*exp(-e*x) (the flux of state).
-%   Click-response times are modelled as a third readout of the same
-%   flux — behavioural responses are triggered by the rate of change
-%   of the prepared state rather than by the state itself.
+% Rationale for S(x):
+%   EDA conforms to the reliability  R(x) = A0 * exp(-e*x) + B0  (the
+%   prepared state).  Respiration (ARU) and click-response times track
+%   its rate sensitivity  S(x) = |dR/dLambda|, proportional to
+%   x*exp(-e*x): they are driven by the rate of change of the prepared
+%   state rather than by the state itself.
 %
 % Panels:
-%   A. Click-time histogram with KDE overlay and best-fit P(1) curve
+%   A. Click-time histogram with KDE overlay and best-fit S(x) curve
 %   B. R^2 as a function of onset lag (with plateau analysis)
 %   C. Residuals  (KDE - model)  with zero crossings
 %
@@ -80,23 +80,23 @@ counts      = histcounts(clickTimes, edges);
 bin_centres = edges(1:end-1) + bin_width / 2;
 
 %% ========================================================================
-%  4. SWEEP ONSET LAGS — fit P(1) to KDE
+%  4. SWEEP ONSET LAGS — fit S(x) to KDE
 %  ========================================================================
 %  Single grid search at 0.1 s resolution.
 
-fprintf('Fitting P(1) model ...\n');
+fprintf('Fitting S(x) model ...\n');
 
 offsets = 0:0.1:15;
 n_off   = length(offsets);
 R2_vals = zeros(1, n_off);
 
 for k = 1:n_off
-    res         = fit_P1_kde(offsets(k), xi_kde, f_kde, T, lambda);
+    res         = fit_sensitivity_kde(offsets(k), xi_kde, f_kde, T, lambda);
     R2_vals(k)  = res.R2;
 end
 
 [~, best_idx] = max(R2_vals);
-best = fit_P1_kde(offsets(best_idx), xi_kde, f_kde, T, lambda);
+best = fit_sensitivity_kde(offsets(best_idx), xi_kde, f_kde, T, lambda);
 
 %% ========================================================================
 %  5. GOODNESS OF FIT METRICS
@@ -160,7 +160,7 @@ fprintf(' s  (%d total)\n', length(zc_times));
 
 col_data  = [0.20 0.40 0.73];    % Blue  — histogram
 col_kde   = [0.12 0.30 0.55];    % Dark blue — KDE line
-col_fit   = [0.80 0.15 0.15];    % Red   — P(1) model curve
+col_fit   = [0.80 0.15 0.15];    % Red   — S(x) model curve
 col_pos   = [0.25 0.65 0.25];    % Green — positive residuals
 col_neg   = [0.80 0.27 0.27];    % Red   — negative residuals
 col_grey  = [0.50 0.50 0.50];    % Grey  — onset-lag marker
@@ -193,7 +193,7 @@ h_a = 0.46;   h_b = 0.30;
 y_a = 1 - mt - h_a;
 y_b = y_a - gap - h_b;
 
-%% ---- Panel A: Histogram + KDE + P(1) fit ----------------------------
+%% ---- Panel A: Histogram + KDE + S(x) fit ----------------------------
 
 ax_a = axes('Position', [ml y_a pw h_a]);
 hold on;
@@ -210,7 +210,7 @@ bar(bin_centres, counts, 1, ...
 plot(xi_kde, f_kde * kde_scale, '-', ...
     'Color', col_kde, 'LineWidth', lw_kde);
 
-% P(1) model curve (smooth, evaluated on a fine grid)
+% S(x) model curve (smooth, evaluated on a fine grid)
 t_mod = linspace(best.offset, T, 500);
 x_mod = (t_mod - best.offset) / best.T_eff;
 x_mod = max(x_mod, 1e-12);
@@ -336,14 +336,14 @@ fprintf('Done.\n');
 %  LOCAL FUNCTION
 %  ========================================================================
 
-function res = fit_P1_kde(offset, xi_kde, f_kde, T, lambda)
-% FIT_P1_KDE  Fit P(1) model (B = 0 fixed) to KDE density.
+function res = fit_sensitivity_kde(offset, xi_kde, f_kde, T, lambda)
+% FIT_SENSITIVITY_KDE  Fit S(x) model (B = 0 fixed) to KDE density.
 %
 %   Model:  f(t) = A * lambda * x * exp(-lambda * x)
 %           x    = (t - offset) / (T - offset)
 %
 %   B is fixed at zero: the click density must vanish asymptotically,
-%   matching the theoretical prediction that P(1) decays to zero.
+%   matching the theoretical prediction that S(x) decays to zero.
 %   A is estimated by scalar projection (closed-form OLS with one
 %   regressor).  Lambda is fixed (not estimated here).
 %
@@ -364,7 +364,7 @@ function res = fit_P1_kde(offset, xi_kde, f_kde, T, lambda)
     x = (t_fit - offset) / T_eff;
     x = max(x, eps);
 
-    % P(1) shape
+    % S(x) shape
     y_shape = lambda .* x .* exp(-lambda .* x);
 
     % Scalar projection:  A = (y_shape · f) / (y_shape · y_shape)

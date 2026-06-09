@@ -5,14 +5,14 @@
 %
 % Panels:
 %   A. Rest grand average -ARU with smoothed trend
-%   B. Task grand average -ARU with P(1) fit (variable lag time)
-%   C. Task residuals (smoothed trend minus P(1) fit, full trial)
+%   B. Task grand average -ARU with S(x) fit (variable lag time)
+%   C. Task residuals (smoothed trend minus S(x) fit, full trial)
 %
-% P(1) model with offset (lambda = e, fixed horizon):
+% S(x) model with offset (lambda = e, fixed horizon):
 %   f(x) = A0 * e * x * exp(-e * x) + B
 %   where x = (t - t0) / T,  T = D - t0  (fixed post-onset window)
 %
-% This mirrors the EDA P(0) approach: time is normalised to [0,1]
+% This mirrors the EDA R(x) approach: time is normalised to [0,1]
 % over the remaining trial window after onset, with lambda = e.
 %
 % Lambda = e (fixed). Only A0 and B are free parameters.
@@ -29,14 +29,14 @@ task_samples = task_duration * fs;
 rest_samples = rest_duration * fs;
 
 % Trend extraction: zero-phase low-pass that removes the breathing rhythm
-% (~0.39 Hz peak in these data) and keeps the slow P(1) trend. Replaces the
+% (~0.39 Hz peak in these data) and keeps the slow S(x) trend. Replaces the
 % earlier 10 s boxcar moving average. Fit R^2 is stable (0.956-0.962) for
 % cutoffs 0.05-0.15 Hz; 0.10 Hz is ~4x below the breathing peak. See code
 % audit 2026-06-09.
 lp_cutoff_hz = 0.10;
 [lp_b, lp_a] = butter(4, lp_cutoff_hz / (fs/2), 'low');
 
-% P(1) model: f(x) = A0 * e * x * exp(-e * x) + B,  x = (t-t0)/(D-t0)
+% S(x) model: f(x) = A0 * e * x * exp(-e * x) + B,  x = (t-t0)/(D-t0)
 % Lambda = e (fixed), T = D - t0 (fixed post-onset window).
 % Grid search over t0; for each t0, fit A0 and B.
 e_const = exp(1);
@@ -71,9 +71,9 @@ n_participants = length(unique_parts);
 
 % Per-participant centering WITHIN each condition separately.
 % This removes between-participant amplitude differences while preserving
-% the within-trial temporal structure (including P(1) dynamics).
+% the within-trial temporal structure (including S(x) dynamics).
 % Using task+rest combined would bias task centering because the rest
-% baseline sits lower, lifting the tail of the task P(1) curve.
+% baseline sits lower, lifting the tail of the task S(x) curve.
 
 task_part_means = zeros(height(task_data), 1);
 rest_part_means = zeros(height(rest_data), 1);
@@ -131,13 +131,13 @@ task_sem  = std(task_part_matrix, 0, 2, 'omitnan') ./ sqrt(n_task_part);
 rest_mean = mean(rest_part_matrix, 2, 'omitnan');
 rest_sem  = std(rest_part_matrix, 0, 2, 'omitnan') ./ sqrt(n_rest_part);
 
-%% Trend = zero-phase low-pass (removes the breathing rhythm, keeps the P(1)
+%% Trend = zero-phase low-pass (removes the breathing rhythm, keeps the S(x)
 %% trend). filtfilt is linear so this equals averaging the per-participant
 %% filtered trends; the fit (below) targets this trend.
 task_smooth = filtfilt(lp_b, lp_a, task_mean);
 rest_smooth = filtfilt(lp_b, lp_a, rest_mean);
 
-%% Fit P(1) with fixed horizon T = D - t0 (normalised time)
+%% Fit S(x) with fixed horizon T = D - t0 (normalised time)
 % For each candidate t0, normalise time to x = (t-t0)/(D-t0) in [0,1],
 % then fit A0 and B in: f(x) = A0 * e * x * exp(-e*x) + B.
 
@@ -146,11 +146,11 @@ best_t0  = NaN;
 best_A0  = NaN;
 best_B   = NaN;
 
-fprintf('\nFitting P(1) with lambda=e, fixed horizon T=D-t0 ...\n');
+fprintf('\nFitting S(x) with lambda=e, fixed horizon T=D-t0 ...\n');
 
-% Define P(1) model function for lsqcurvefit:
+% Define S(x) model function for lsqcurvefit:
 %   params = [A0, B],  xdata = normalised time x in [0,1]
-p1_func = @(params, x) params(1) .* e_const .* x .* exp(-e_const .* x) + params(2);
+sensitivity_func = @(params, x) params(1) .* e_const .* x .* exp(-e_const .* x) + params(2);
 
 opts = optimoptions('lsqcurvefit', 'Display', 'off');
 lb = [-Inf, -Inf];
@@ -175,12 +175,12 @@ for ti = 1:length(t0_search)
     x0 = [A0_guess, y_late];
     
     try
-        params = lsqcurvefit(p1_func, x0, x_norm, y_fit, lb, ub, opts);
+        params = lsqcurvefit(sensitivity_func, x0, x_norm, y_fit, lb, ub, opts);
     catch
         continue;
     end
     
-    y_pred = p1_func(params, x_norm);
+    y_pred = sensitivity_func(params, x_norm);
     SS_res = sum((y_fit - y_pred).^2);
     SS_tot = sum((y_fit - mean(y_fit)).^2);
     R2 = 1 - SS_res / SS_tot;
@@ -199,16 +199,16 @@ best_k = e_const / best_T;                    % effective rate in clock time
 fprintf('  Best fit: t0=%.1fs, A0=%.1f, B=%.1f, T=%.1fs, R²=%.3f\n', ...
     best_t0, best_A0, best_B, best_T, best_R2);
 fprintf('  lambda = e (fixed), k_eff = e/T = e/%.1f = %.4f\n', best_T, best_k);
-fprintf('  P(1) peak at t0 + T/e = %.1f + %.1f = %.1fs\n', ...
+fprintf('  S(x) peak at t0 + T/e = %.1f + %.1f = %.1fs\n', ...
     best_t0, best_T/e_const, best_t0 + best_T/e_const);
 
-% Generate P(1) prediction only for t >= t0
+% Generate S(x) prediction only for t >= t0
 fit_mask = task_time >= best_t0;
 x_norm_full = (task_time(fit_mask) - best_t0) / best_T;
-p1_fit_region = best_A0 .* e_const .* x_norm_full .* exp(-e_const .* x_norm_full) + best_B;
+s_fit_region = best_A0 .* e_const .* x_norm_full .* exp(-e_const .* x_norm_full) + best_B;
 
 % Residuals only in fit region (t >= t0)
-task_residuals_fit = task_smooth(fit_mask) - p1_fit_region;
+task_residuals_fit = task_smooth(fit_mask) - s_fit_region;
 RMSE_fit = sqrt(mean(task_residuals_fit.^2));
 
 fprintf('  RMSE (fit region): %.2f ARU\n', RMSE_fit);
@@ -258,12 +258,12 @@ plot(task_time, task_mean, 'Color', [color_task, 0.4], 'LineWidth', 0.5);
 % Smoothed trend
 h_smooth = plot(task_time, task_smooth, 'Color', color_task_dark, 'LineWidth', 2);
 
-% P(1) fit (dashed black) — only from t0 onward
+% S(x) fit (dashed black) — only from t0 onward
 fit_time = task_time(fit_mask);
-h_model = plot(fit_time, p1_fit_region, '--', 'Color', color_model, 'LineWidth', 2);
+h_model = plot(fit_time, s_fit_region, '--', 'Color', color_model, 'LineWidth', 2);
 
-% Peak marker on P(1) fit
-[peak_val, peak_idx] = max(p1_fit_region);
+% Peak marker on S(x) fit
+[peak_val, peak_idx] = max(s_fit_region);
 peak_t = fit_time(peak_idx);
 plot(peak_t, peak_val, 'v', 'Color', color_model, 'MarkerSize', 8, ...
     'MarkerFaceColor', color_model, 'MarkerEdgeColor', 'k', 'LineWidth', 0.5);
@@ -306,7 +306,7 @@ print(fig, '../../results/Fig7_ARU', '-dpng', '-r300');
 fprintf('\nSaved Fig7_ARU.png\n');
 
 fprintf('\n==========================================================\n');
-fprintf('  P(1) Model: f(x) = A0 * e * x * exp(-e*x) + B\n');
+fprintf('  S(x) Model: f(x) = A0 * e * x * exp(-e*x) + B\n');
 fprintf('  where x = (t - t0) / T,  T = D - t0  (D = %ds)\n', task_duration);
 fprintf('==========================================================\n');
 fprintf('  Offset t0:    %.1f s\n', best_t0);
