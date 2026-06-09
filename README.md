@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MATLAB](https://img.shields.io/badge/MATLAB-R2023b+-blue.svg)](https://www.mathworks.com/products/matlab.html)
 
-Companion code and preprocessed data for the IEEE ICDL 2026 paper (under review):
+Companion code and preprocessed data for the IEEE ICDL 2026 paper (accepted as a poster):
 
 > **Embodied temporal anticipation: Stochastic processes approximate optimal waiting strategies in a social decision-making task**
 >
@@ -13,7 +13,7 @@ Companion code and preprocessed data for the IEEE ICDL 2026 paper (under review)
 
 ## Overview
 
-This repository contains the preprocessing scripts, analysis code, and preprocessed data needed to reproduce all figures and statistical results reported in the paper. The analysis demonstrates that physiological signals (electrodermal activity and respiration) and behavioral responses (click times) during a perceptual crossing experiment follow Poisson process dynamics with λ = *e*, providing an embodied mechanism for optimal stopping without explicit time representation.
+This repository contains the preprocessing scripts, analysis code, and preprocessed data needed to reproduce all figures and statistical results reported in the paper. The analysis shows that physiological signals (electrodermal activity and respiration) and behavioral responses (click times) during a perceptual crossing experiment are captured by the *rate sensitivity* of a memoryless decaying state: electrodermal activity tracks a reliability decay `R(x) = e^(-Λx)`, while respiration and click times track its rate sensitivity `S(x) = |∂R/∂Λ| = x·e^(-Λx)`, which peaks at `1/e` of the trial when `Λ = e`. This provides an embodied mechanism for approximating optimal stopping without an explicit representation of time.
 
 ## Repository Structure
 
@@ -65,18 +65,29 @@ All analysis scripts are designed to be run from `code/analysis/`:
 ```matlab
 cd code/analysis
 
-% Figure 4: Click response-time distribution with P(1) fit
+% Figure 4: Click response-time distribution with rate-sensitivity S(x) fit
 plotClickTimesFigure
 
-% Figures 5 & 6: EDA rest and task conditions with P(0) fits
+% Figures 5 & 6: EDA rest and task conditions with reliability R(x) fits
 % Also generates supplementary onset-lag figure
 plotEDAFigures
 
-% Figure 7: Respiration (ARU) with P(1) fit
+% Figure 7: Respiration (ARU) with rate-sensitivity S(x) fit
 plotARUFigures
 ```
 
 Output figures are saved to `results/` at 600 dpi (EDA) or 300 dpi (click times, ARU).
+
+### Figure numbering
+
+The output filenames (`Fig4`–`Fig7`) use the repository's own numbering. In the published paper these are **Figures 5–8**; the earlier figures present the model and the experimental protocol.
+
+| Repository file | Paper figure |
+|---|---|
+| `results/Fig4_ClickTimes.png` | Figure 5 — click response times |
+| `results/Fig5_EDA_Rest.png`   | Figure 6 — EDA, rest |
+| `results/Fig6_EDA_Task.png`   | Figure 7 — EDA, task |
+| `results/Fig7_ARU.png`        | Figure 8 — respiration (ARU) |
 
 ## Data Description
 
@@ -128,7 +139,7 @@ If you use this code or data, please cite:
   title     = {Embodied temporal anticipation: Stochastic processes approximate optimal waiting strategies in a social decision-making task},
   author    = {Froese, Tom},
   booktitle = {Proceedings of the 2026 IEEE International Conference on Development and Learning (ICDL)},
-  year      = {under review},
+  year      = {2026},
   publisher = {IEEE}
 }
 ```
