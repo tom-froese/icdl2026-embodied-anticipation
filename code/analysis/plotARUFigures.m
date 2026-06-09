@@ -28,16 +28,21 @@ rest_duration = 180;
 task_samples = task_duration * fs;
 rest_samples = rest_duration * fs;
 
-smooth_window_s = 10;
-smooth_samples = smooth_window_s * fs;
+% Trend extraction: zero-phase low-pass that removes the breathing rhythm
+% (~0.39 Hz peak in these data) and keeps the slow P(1) trend. Replaces the
+% earlier 10 s boxcar moving average. Fit R^2 is stable (0.956-0.962) for
+% cutoffs 0.05-0.15 Hz; 0.10 Hz is ~4x below the breathing peak. See code
+% audit 2026-06-09.
+lp_cutoff_hz = 0.10;
+[lp_b, lp_a] = butter(4, lp_cutoff_hz / (fs/2), 'low');
 
 % P(1) model: f(x) = A0 * e * x * exp(-e * x) + B,  x = (t-t0)/(D-t0)
 % Lambda = e (fixed), T = D - t0 (fixed post-onset window).
 % Grid search over t0; for each t0, fit A0 and B.
 e_const = exp(1);
 
-% Lag time search range
-t0_search = 1.0 : 0.1 : 10.0;
+% Lag time search range (harmonized with clicks/EDA: [0, 15] s)
+t0_search = 0.0 : 0.1 : 15.0;
 
 % Figure style
 color_task = [0.8, 0.2, 0.2];
@@ -83,46 +88,54 @@ end
 task_centered = task_data.RESP_ARU - task_part_means;
 rest_centered = rest_data.RESP_ARU - rest_part_means;
 
-%% Reshape into matrices
+%% Aggregate to the PARTICIPANT level (two-level: average trials within a
+%% participant, then average across participants), so the grand average and
+%% SEM are at the participant level rather than the trial level. This fixes the
+%% pseudo-replication that made the SEM ~sqrt(1116/62)=4.2x too narrow, and
+%% matches the EDA pipeline. Trial/segment counts are kept for captions only.
 task_segments = unique(task_data(:, {'DyadID','ParticipantID','TrialNum'}), 'rows');
-n_task_seg = height(task_segments);
-task_matrix = NaN(task_samples, n_task_seg);
-
-for i = 1:n_task_seg
-    mask = task_data.DyadID == task_segments.DyadID(i) & ...
-           task_data.ParticipantID == task_segments.ParticipantID(i) & ...
-           task_data.TrialNum == task_segments.TrialNum(i);
-    vals = task_centered(mask);
-    if length(vals) == task_samples
-        task_matrix(:, i) = vals;
-    end
-end
-
+n_task_seg = height(task_segments);          % # task trials (caption only)
 rest_segments = unique(rest_data(:, {'DyadID','ParticipantID','RestNum'}), 'rows');
-n_rest_seg = height(rest_segments);
-rest_matrix = NaN(rest_samples, n_rest_seg);
+n_rest_seg = height(rest_segments);          % # rest segments (caption only)
 
-for i = 1:n_rest_seg
-    mask = rest_data.DyadID == rest_segments.DyadID(i) & ...
-           rest_data.ParticipantID == rest_segments.ParticipantID(i) & ...
-           rest_data.RestNum == rest_segments.RestNum(i);
-    vals = rest_centered(mask);
-    if length(vals) == rest_samples
-        rest_matrix(:, i) = vals;
+task_part_matrix = NaN(task_samples, n_participants);
+rest_part_matrix = NaN(rest_samples, n_participants);
+for i = 1:n_participants
+    pk = unique_parts(i);
+    pseg = task_segments(task_segments.DyadID*10 + task_segments.ParticipantID == pk, :);
+    acc = zeros(task_samples,1); k = 0;
+    for s = 1:height(pseg)
+        m = task_data.DyadID==pseg.DyadID(s) & task_data.ParticipantID==pseg.ParticipantID(s) & task_data.TrialNum==pseg.TrialNum(s);
+        v = task_centered(m);
+        if numel(v)==task_samples, acc = acc + v; k = k + 1; end
     end
+    if k>0, task_part_matrix(:,i) = acc / k; end
+
+    rseg = rest_segments(rest_segments.DyadID*10 + rest_segments.ParticipantID == pk, :);
+    acc = zeros(rest_samples,1); k = 0;
+    for s = 1:height(rseg)
+        m = rest_data.DyadID==rseg.DyadID(s) & rest_data.ParticipantID==rseg.ParticipantID(s) & rest_data.RestNum==rseg.RestNum(s);
+        v = rest_centered(m);
+        if numel(v)==rest_samples, acc = acc + v; k = k + 1; end
+    end
+    if k>0, rest_part_matrix(:,i) = acc / k; end
 end
 
-%% Grand average, SEM, smoothed
-task_mean = nanmean(task_matrix, 2);
-task_sem  = nanstd(task_matrix, 0, 2) ./ sqrt(sum(~isnan(task_matrix), 2));
+%% Grand average + participant-level SEM
 task_time = (0:task_samples-1)' / fs;
-
-rest_mean = nanmean(rest_matrix, 2);
-rest_sem  = nanstd(rest_matrix, 0, 2) ./ sqrt(sum(~isnan(rest_matrix), 2));
 rest_time = (0:rest_samples-1)' / fs;
+n_task_part = sum(all(~isnan(task_part_matrix),1));
+n_rest_part = sum(all(~isnan(rest_part_matrix),1));
+task_mean = mean(task_part_matrix, 2, 'omitnan');
+task_sem  = std(task_part_matrix, 0, 2, 'omitnan') ./ sqrt(n_task_part);
+rest_mean = mean(rest_part_matrix, 2, 'omitnan');
+rest_sem  = std(rest_part_matrix, 0, 2, 'omitnan') ./ sqrt(n_rest_part);
 
-task_smooth = movmean(task_mean, smooth_samples);
-rest_smooth = movmean(rest_mean, smooth_samples);
+%% Trend = zero-phase low-pass (removes the breathing rhythm, keeps the P(1)
+%% trend). filtfilt is linear so this equals averaging the per-participant
+%% filtered trends; the fit (below) targets this trend.
+task_smooth = filtfilt(lp_b, lp_a, task_mean);
+rest_smooth = filtfilt(lp_b, lp_a, rest_mean);
 
 %% Fit P(1) with fixed horizon T = D - t0 (normalised time)
 % For each candidate t0, normalise time to x = (t-t0)/(D-t0) in [0,1],
@@ -227,7 +240,7 @@ set(gca, 'FontSize', font_size, 'Box', 'on');
 xlim([0, rest_duration]);
 xlabel('Time (s)', 'FontSize', font_size);
 
-legend(h_smooth, sprintf('Smoothed (%ds)', smooth_window_s), ...
+legend(h_smooth, sprintf('Low-pass (%.2f Hz)', lp_cutoff_hz), ...
     'Location', 'northeast', 'FontSize', 9, 'Box', 'off');
 
 % ---- Panel B: Task Grand Average with P(1) fit ----
@@ -277,7 +290,7 @@ ylim(ax1, common_yl);
 ylim(ax2, common_yl);
 
 legend([h_smooth, h_model], ...
-    {sprintf('Smoothed (%ds)', smooth_window_s), ...
+    {sprintf('Low-pass (%.2f Hz)', lp_cutoff_hz), ...
      sprintf('P(1): A_0=%.1f, B=%.1f, \\lambda=e, T=%.1fs, t_0=%.1fs, R^2=%.3f', ...
              best_A0, best_B, best_T, best_t0, best_R2)}, ...
     'Location', 'southeast', 'FontSize', 9, 'Box', 'off');

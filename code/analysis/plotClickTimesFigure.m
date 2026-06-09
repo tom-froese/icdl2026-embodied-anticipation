@@ -45,7 +45,11 @@ data = readtable('../../data/ClickTimes/ClickResponseTimes.csv');
 
 clickTimes = data.ClickTime_s(data.Clicked == 1);
 clickTimes = clickTimes(~isnan(clickTimes));
-clickTimes = clickTimes(clickTimes >= 0 & clickTimes < 60);
+% Exclude clicks at exactly t = 0 s: a button already held at trial onset is a
+% logging artifact (held button / no rising edge), not an in-trial response.
+% Affects 3 of 1030 clicks; R^2 0.945 -> 0.948, t0/peak unchanged. The upstream
+% rising-edge guard belongs in preprocessClicks.m. See code audit 2026-06-09.
+clickTimes = clickTimes(clickTimes > 0 & clickTimes < 60);
 
 T        = 60;                             % Trial duration (s)
 lambda   = exp(1);                         % Rate parameter fixed at e

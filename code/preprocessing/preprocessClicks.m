@@ -136,6 +136,15 @@ for f = 1:length(folders)
         end
 
         % --- Extract first click for each participant ---
+        % NOTE (code audit 2026-06-09): `find(button == 1, 'first')` records a
+        % press even when the button is already held at the first sample
+        % (t = 0), which injected 3 artifactual t = 0 clicks. The correct guard
+        % is a rising-edge test, e.g. for participant 1:
+        %   b0_press = data.button0 == 1 & [false; data.button0(1:end-1) == 0];
+        %   b0_idx   = find(b0_press, 1, 'first');
+        % Left as the simple find() here for byte-identical reproduction of the
+        % committed CSV; the analysis script excludes t = 0 downstream. Enable
+        % the rising-edge guard when reprocessing from raw data.
         % Participant 1 (button0)
         b0_idx = find(data.button0 == 1, 1, 'first');
         if ~isempty(b0_idx)
