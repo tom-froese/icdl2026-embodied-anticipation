@@ -180,19 +180,18 @@ lw_kde        = 1.8;
 
 fprintf('Creating figure ...\n');
 
-fig_w = 7.5;   fig_h = 11.5;
+fig_w = 7.5;   fig_h = 8.0;
 fig = figure('Units', 'inches', 'Position', [0.5 0.5 fig_w fig_h], ...
     'Color', 'w', 'PaperUnits', 'inches', ...
     'PaperSize', [fig_w fig_h], 'PaperPosition', [0 0 fig_w fig_h]);
 
-% Layout geometry (normalised)
-ml  = 0.13;  mr = 0.05;  mt = 0.04;  mb = 0.06;  gap = 0.08;
+% Layout geometry (normalised) -- 2 panels (residual panel removed for camera-ready)
+ml  = 0.13;  mr = 0.05;  mt = 0.05;  mb = 0.08;  gap = 0.11;
 pw  = 1 - ml - mr;
 
-h_a = 0.30;   h_b = 0.20;   h_c = 0.22;
+h_a = 0.46;   h_b = 0.30;
 y_a = 1 - mt - h_a;
 y_b = y_a - gap - h_b;
-y_c = y_b - gap - h_c;
 
 %% ---- Panel A: Histogram + KDE + P(1) fit ----------------------------
 
@@ -227,12 +226,13 @@ xline(best.offset,   '--', 'Color', col_grey, 'LineWidth', 1, 'Alpha', 0.7);
 xlim([0 T]);
 ylim([0 max(counts) * 1.15]);
 ylabel('Number of clicks', 'FontSize', font_sz_label);
+xlabel('Time (s)', 'FontSize', font_sz_label);
 title('Click Response-Time Distribution', ...
     'FontSize', font_sz_title, 'FontWeight', 'bold');
 set(gca, 'FontSize', font_sz, 'Box', 'on', 'TickDir', 'out');
 
 legend({sprintf('Clicks  (n = %d)', n_clicks), 'KDE', ...
-        '$P_1(x) = A\,e\,x\,\mathrm{e}^{-ex}$'}, ...
+        '$S(x) \propto x\,\mathrm{e}^{-ex}$'}, ...
     'FontSize', font_sz_annot, 'Location', 'northwest', ...
     'Box', 'off', 'Interpreter', 'latex');
 
@@ -268,20 +268,20 @@ xline(best.offset, '--', 'Color', col_fit, 'LineWidth', 1.5, 'Alpha', 0.8);
 plot(best.offset, best.R2, 'o', 'Color', col_fit, ...
     'MarkerSize', 8, 'MarkerFaceColor', col_fit, 'LineWidth', 1.2);
 
-% Annotation — best lag (above curve, offset to the right)
-text(best.offset + 1.5, best.R2 + 0.02, ...
+% Annotation — best lag (in the headroom above the peak, clear of the title)
+text(best.offset + 0.6, max(R2_vals) * 1.13, ...
     sprintf('Best: %.1f s  (R^2 = %.3f)', best.offset, best.R2), ...
     'FontSize', font_sz_annot, 'Color', col_fit, ...
-    'VerticalAlignment', 'bottom');
+    'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle');
 
-% Annotation — plateau (below, left-aligned with band)
-text(plateau_lo, 0.06, ...
+% Annotation — plateau (to the right of the band, low, in open space)
+text(plateau_hi + 0.4, 0.10, ...
     sprintf('1%% plateau: [%.1f, %.1f] s', plateau_lo, plateau_hi), ...
     'FontSize', 9, 'Color', col_grey, ...
-    'VerticalAlignment', 'bottom');
+    'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
 
 xlim([0 15]);
-ylim([0 max(R2_vals) * 1.08]);
+ylim([0 max(R2_vals) * 1.22]);
 xlabel('Onset lag (s)', 'FontSize', font_sz_label);
 ylabel('R²', 'FontSize', font_sz_label);
 title('Goodness of Fit vs. Onset Lag', ...
@@ -293,48 +293,8 @@ text(-0.10, 1.08, 'B', 'Units', 'normalized', ...
     'FontSize', font_sz_panel, 'FontWeight', 'bold');
 hold off;
 
-%% ---- Panel C: Residuals (KDE − model) with zero crossings -----------
-
-ax_c = axes('Position', [ml y_c pw h_c]);
-hold on;
-
-% Filled positive / negative regions
-fill_pos = max(residual_v, 0);
-fill_neg = min(residual_v, 0);
-area(residual_t, fill_pos, 'FaceColor', col_pos, 'FaceAlpha', 0.45, ...
-    'EdgeColor', 'none');
-area(residual_t, fill_neg, 'FaceColor', col_neg, 'FaceAlpha', 0.45, ...
-    'EdgeColor', 'none');
-
-% Residual trace
-plot(residual_t, residual_v, '-k', 'LineWidth', 0.8);
-
-yline(0, '-k', 'LineWidth', 0.5);
-xline(best.offset, '--', 'Color', col_grey, 'LineWidth', 1, 'Alpha', 0.7);
-
-% Mark zero crossings
-rlim = max(abs(residual_v)) * 1.4;
-for k = 1:length(zc_times)
-    xline(zc_times(k), ':', 'Color', [0.5 0.5 0.5], ...
-        'LineWidth', 0.6, 'Alpha', 0.5);
-end
-
-xlim([0 T]);
-ylim([-rlim rlim]);
-xlabel('Time (s)', 'FontSize', font_sz_label);
-ylabel('Residual (density)', 'FontSize', font_sz_label);
-title(sprintf('Residuals (KDE - P(1) Model),   RMSE = %.2e', best.RMSE), ...
-    'FontSize', font_sz_title, 'FontWeight', 'bold');
-set(gca, 'FontSize', font_sz, 'Box', 'on', 'TickDir', 'out');
-
-text(0.97, 0.05, ...
-    sprintf('%d zero crossings', length(zc_times)), ...
-    'Units', 'normalized', 'FontSize', font_sz_annot, ...
-    'HorizontalAlignment', 'right', 'Color', col_grey);
-
-text(-0.10, 1.08, 'C', 'Units', 'normalized', ...
-    'FontSize', font_sz_panel, 'FontWeight', 'bold');
-hold off;
+% ---- Residual panel (Panel C) removed for the camera-ready (not
+%      load-bearing; the residual structure is noted in the manuscript text). ----
 
 %% ========================================================================
 %  9. SAVE

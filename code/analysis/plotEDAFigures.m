@@ -242,7 +242,7 @@ eda_ymax = max([max(rest_mean + rest_sem), max(task_mean + task_sem)]) + 0.1;
 
 fprintf('Creating Figure 1 (Rest) ...\n');
 
-fig1_height_in = 8.0;  % 2 stacked panels
+fig1_height_in = 4.3;  % single panel (residuals removed for camera-ready)
 fig1 = figure('Units', 'inches', 'Position', [0.5 0.5 fig_width_in fig1_height_in], ...
     'Color', 'w', 'PaperUnits', 'inches', ...
     'PaperSize', [fig_width_in fig1_height_in], ...
@@ -251,7 +251,7 @@ fig1 = figure('Units', 'inches', 'Position', [0.5 0.5 fig_width_in fig1_height_i
 % Layout
 gap = 0.08;
 margin_left = 0.14;
-margin_right = 0.03;
+margin_right = 0.065;   % wider right margin so the last x-tick (60/180) is not clipped
 margin_top = 0.04;
 margin_bot = 0.10;
 panel_w = 1 - margin_left - margin_right;
@@ -261,8 +261,8 @@ start_y = 1 - margin_top - h_main;
 
 resid_absmax_rest = max(abs(resid_rest)) * 1.15;
 
-% ---- Panel A: Rest EDA + P(0) fit ----
-ax1a = axes('Position', [margin_left, start_y, panel_w, h_main]);
+% ---- Rest EDA + R(x) fit (single panel) ----
+ax1a = axes('Position', [margin_left, 0.15, panel_w, 0.78]);
 hold on;
 fill([rest_time, fliplr(rest_time)], ...
     [rest_mean + rest_sem, fliplr(rest_mean - rest_sem)], ...
@@ -273,6 +273,8 @@ ylabel('EDA (\muS)', 'FontSize', font_size_label);
 set(gca, 'FontSize', font_size, 'Box', 'on', 'TickDir', 'out');
 title('Rest', 'FontSize', font_size_title, 'FontWeight', 'bold');
 ylim([eda_ymin, eda_ymax]);
+xlabel('Time (s)', 'FontSize', font_size_label);
+xlim([0 180]);
 
 % Annotation box
 text(0.97, 0.95, {sprintf('R^2 = %.3f', R2_rest), ...
@@ -281,23 +283,9 @@ text(0.97, 0.95, {sprintf('R^2 = %.3f', R2_rest), ...
     'Units', 'normalized', 'FontSize', font_size_annot, ...
     'HorizontalAlignment', 'right', 'VerticalAlignment', 'top', ...
     'BackgroundColor', 'w', 'EdgeColor', [0.7 0.7 0.7], 'Margin', 3);
-legend({'\pmSEM', 'Grand average', 'P(0): A_0e^{-e\cdotx}+B'}, ...
+legend({'\pmSEM', 'Grand average', 'R(x): A_0e^{-e\cdotx}+B'}, ...
     'FontSize', font_size_legend, 'Location', 'east', 'Box', 'off');
-text(-0.12, 1.06, 'A', 'Units', 'normalized', 'FontSize', font_size_panel, 'FontWeight', 'bold');
 hold off;
-
-% ---- Panel B: Rest residuals ----
-pos_1b = [margin_left, margin_bot, panel_w, h_resid];
-ax1b = axes('Position', pos_1b);
-hold on;
-plot_residuals(rest_time, resid_rest, col_pos, col_neg, font_size_zc);
-set(gca, 'FontSize', font_size, 'Box', 'on', 'TickDir', 'out');
-ylabel('Resid. (m\muS)', 'FontSize', font_size_label);
-xlabel('Time (s)', 'FontSize', font_size_label);
-ylim([-resid_absmax_rest, resid_absmax_rest]);
-text(-0.12, 1.08, 'B', 'Units', 'normalized', 'FontSize', font_size_panel, 'FontWeight', 'bold');
-linkaxes([ax1a, ax1b], 'x');
-xlim(ax1a, [0 180]);
 
 print(fig1, '../../results/Fig5_EDA_Rest', '-dpng', '-r600');
 fprintf('  Saved: Fig5_EDA_Rest.png (600 dpi)\n');
@@ -388,7 +376,7 @@ fprintf('  Saved: FigSI_EDA_OnsetLag.png (600 dpi)\n');
 
 fprintf('Creating Figure 3 (Task — optimised fit) ...\n');
 
-fig3_height_in = 8.0;  % 2 stacked panels
+fig3_height_in = 4.3;  % single panel (residuals removed for camera-ready)
 fig3 = figure('Units', 'inches', 'Position', [9.0 0.5 fig_width_in fig3_height_in], ...
     'Color', 'w', 'PaperUnits', 'inches', ...
     'PaperSize', [fig_width_in fig3_height_in], ...
@@ -396,8 +384,8 @@ fig3 = figure('Units', 'inches', 'Position', [9.0 0.5 fig_width_in fig3_height_i
 
 resid_absmax_task = max(abs(resid_task_opt_post)) * 1.15;
 
-% ---- Panel A: Task EDA + P(0) fit at optimal onset lag ----
-ax3a = axes('Position', [margin_left, start_y, panel_w, h_main]);
+% ---- Task EDA + R(x) fit at optimal onset lag (single panel) ----
+ax3a = axes('Position', [margin_left, 0.15, panel_w, 0.78]);
 hold on;
 
 % SEM shading (full trial)
@@ -418,6 +406,8 @@ ylabel('EDA (\muS)', 'FontSize', font_size_label);
 set(gca, 'FontSize', font_size, 'Box', 'on', 'TickDir', 'out');
 title('Task', 'FontSize', font_size_title, 'FontWeight', 'bold');
 ylim([eda_ymin, eda_ymax]);
+xlabel('Time (s)', 'FontSize', font_size_label);
+xlim([0 60]);
 
 % Annotation box
 text(0.97, 0.95, {sprintf('\\tau = %.1f s', tau_opt), ...
@@ -427,24 +417,10 @@ text(0.97, 0.95, {sprintf('\\tau = %.1f s', tau_opt), ...
     'Units', 'normalized', 'FontSize', font_size_annot, ...
     'HorizontalAlignment', 'right', 'VerticalAlignment', 'top', ...
     'BackgroundColor', 'w', 'EdgeColor', [0.7 0.7 0.7], 'Margin', 3);
-legend({'\pmSEM', 'Grand average', 'P(0) fit', ...
+legend({'\pmSEM', 'Grand average', 'R(x) fit', ...
     sprintf('\\tau = %.1f s', tau_opt)}, ...
     'FontSize', font_size_legend, 'Location', 'southeast', 'Box', 'off');
-text(-0.12, 1.06, 'A', 'Units', 'normalized', 'FontSize', font_size_panel, 'FontWeight', 'bold');
 hold off;
-
-% ---- Panel B: Task residuals (optimised fit, post-onset only) ----
-pos_3b = [margin_left, margin_bot, panel_w, h_resid];
-ax3b = axes('Position', pos_3b);
-hold on;
-plot_residuals(task_time(idx_opt), resid_task_opt_post, col_pos, col_neg, font_size_zc);
-xlabel('Time (s)', 'FontSize', font_size_label);
-ylabel('Resid. (m\muS)', 'FontSize', font_size_label);
-set(gca, 'FontSize', font_size, 'Box', 'on', 'TickDir', 'out');
-ylim([-resid_absmax_task, resid_absmax_task]);
-text(-0.12, 1.08, 'B', 'Units', 'normalized', 'FontSize', font_size_panel, 'FontWeight', 'bold');
-linkaxes([ax3a, ax3b], 'x');
-xlim(ax3a, [0 60]);
 
 print(fig3, '../../results/Fig6_EDA_Task', '-dpng', '-r600');
 fprintf('  Saved: Fig6_EDA_Task.png (600 dpi)\n');

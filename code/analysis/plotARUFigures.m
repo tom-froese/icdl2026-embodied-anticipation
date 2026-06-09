@@ -214,13 +214,13 @@ RMSE_fit = sqrt(mean(task_residuals_fit.^2));
 fprintf('  RMSE (fit region): %.2f ARU\n', RMSE_fit);
 
 %% ========================================================================
-%  FIGURE: 3-panel vertical stack
+%  FIGURE: 2-panel vertical stack (residual panel removed for camera-ready)
 %  ========================================================================
 
-fig = figure('Position', [100, 50, 900, 750], 'Color', 'w');
+fig = figure('Position', [100, 50, 900, 500], 'Color', 'w');
 
 % ---- Panel A: Rest Grand Average ----
-ax1 = subplot(3, 1, 1);
+ax1 = subplot(2, 1, 1);
 hold on;
 
 fill([rest_time; flipud(rest_time)], ...
@@ -243,8 +243,8 @@ xlabel('Time (s)', 'FontSize', font_size);
 legend(h_smooth, sprintf('Low-pass (%.2f Hz)', lp_cutoff_hz), ...
     'Location', 'northeast', 'FontSize', 9, 'Box', 'off');
 
-% ---- Panel B: Task Grand Average with P(1) fit ----
-ax2 = subplot(3, 1, 2);
+% ---- Panel B: Task Grand Average with S(x) fit ----
+ax2 = subplot(2, 1, 2);
 hold on;
 
 % SEM shading
@@ -277,10 +277,11 @@ yline(0, ':', 'Color', [0.5 0.5 0.5], 'LineWidth', 0.5);
 hold off;
 
 ylabel('ARU', 'FontSize', font_size);
-title(sprintf('B.  Task: Grand Average with P(1) fit (N=%d, %d trials)', ...
+title(sprintf('B.  Task: Grand Average with S(x) fit (N=%d, %d trials)', ...
     n_participants, n_task_seg), 'FontSize', title_size, 'FontWeight', 'bold');
-set(gca, 'FontSize', font_size, 'Box', 'on', 'XTickLabel', []);
+set(gca, 'FontSize', font_size, 'Box', 'on');
 xlim([0, task_duration]);
+xlabel('Time (s)', 'FontSize', font_size);
 
 % Match y-axes between panels A and B
 yl_rest = get(ax1, 'YLim');
@@ -291,67 +292,14 @@ ylim(ax2, common_yl);
 
 legend([h_smooth, h_model], ...
     {sprintf('Low-pass (%.2f Hz)', lp_cutoff_hz), ...
-     sprintf('P(1): A_0=%.1f, B=%.1f, \\lambda=e, T=%.1fs, t_0=%.1fs, R^2=%.3f', ...
+     sprintf('S(x): A_0=%.1f, B=%.1f, \\Lambda=e, T=%.1fs, t_0=%.1fs, R^2=%.3f', ...
              best_A0, best_B, best_T, best_t0, best_R2)}, ...
     'Location', 'southeast', 'FontSize', 9, 'Box', 'off');
 
-% ---- Panel C: Task Residuals (post-onset only) ----
-ax3 = subplot(3, 1, 3);
-hold on;
-
-% Filled residual areas (post-onset only)
-pos_r = max(task_residuals_fit, 0);
-neg_r = min(task_residuals_fit, 0);
-area(fit_time, pos_r, 'FaceColor', resid_pos, ...
-    'FaceAlpha', 0.5, 'EdgeColor', 'none');
-area(fit_time, neg_r, 'FaceColor', resid_neg, ...
-    'FaceAlpha', 0.5, 'EdgeColor', 'none');
-
-% Residual line
-plot(fit_time, task_residuals_fit, 'Color', color_task_dark, 'LineWidth', 1);
-
-% Zero and offset lines
-yline(0, '-', 'Color', [0.5, 0, 0], 'LineWidth', 1);
-xline(best_t0, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1.2);
-
-% Zero crossings with minimum gap filter (matching EDA approach)
-min_zc_gap = 5;  % seconds
-signs = sign(task_residuals_fit);
-zc_idx = find(signs(1:end-1) .* signs(2:end) < 0);
-zc_all = zeros(1, length(zc_idx));
-for z = 1:length(zc_idx)
-    i = zc_idx(z);
-    zc_all(z) = fit_time(i) - task_residuals_fit(i) * ...
-        (fit_time(i+1) - fit_time(i)) / (task_residuals_fit(i+1) - task_residuals_fit(i));
-end
-% Filter: keep only crossings separated by >= min_zc_gap
-if ~isempty(zc_all)
-    zc_filt = zc_all(1);
-    for z = 2:length(zc_all)
-        if zc_all(z) - zc_filt(end) >= min_zc_gap
-            zc_filt(end+1) = zc_all(z);  %#ok<AGROW>
-        end
-    end
-    ylims = [min(task_residuals_fit)*1.1, max(task_residuals_fit)*1.1];
-    for z = 1:length(zc_filt)
-        xline(zc_filt(z), ':', 'Color', [0.5 0.5 0.5], 'LineWidth', 0.8);
-        text(zc_filt(z), ylims(2)*0.85, sprintf('%.1fs', zc_filt(z)), ...
-            'FontSize', font_size - 2, 'HorizontalAlignment', 'center', ...
-            'Color', [0.3 0.3 0.3]);
-    end
-end
-
-hold off;
-
-xlabel('Time (s)', 'FontSize', font_size);
-ylabel('Residual (ARU)', 'FontSize', font_size);
-title(sprintf('C.  Task: Residuals (RMSE = %.2f ARU)', ...
-    RMSE_fit), 'FontSize', title_size, 'FontWeight', 'bold');
-set(gca, 'FontSize', font_size, 'Box', 'on');
-xlim([0, task_duration]);
-
-% Link x-axes for task panels
-linkaxes([ax2, ax3], 'x');
+% ---- Task residual panel removed for the camera-ready (not load-bearing;
+%      the residual structure is noted in the manuscript text). RMSE_fit is
+%      still computed above for the console summary. ----
+min_zc_gap = 5;  % seconds (kept for the console summary below)
 
 %% Save
 print(fig, '../../results/Fig7_ARU', '-dpng', '-r300');
