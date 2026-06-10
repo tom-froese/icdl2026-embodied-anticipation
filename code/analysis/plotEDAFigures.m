@@ -5,18 +5,16 @@
 %
 % Generates three figures sized for IEEE double-column format:
 %
-% FIGURE 1: Rest condition (2 vertically stacked panels)
-%   A. Rest grand average + R(x) fit
-%   B. Rest residuals with green/red shading and zero crossings
+% FIGURE 1: Rest condition (single panel)
+%   Rest grand average + R(x) fit
 %
 % FIGURE 2: Onset lag analysis (2 panels, for reference only — not
 %           included in manuscript)
 %   A. R² vs. onset lag (both conditions)
 %   B. Free rate vs. e/(60-tau) crossing
 %
-% FIGURE 3: Task condition — optimised R(x) fit (2 vertically stacked panels)
-%   A. Task EDA with R(x) fit at optimal onset lag
-%   B. Residuals of the optimised fit
+% FIGURE 3: Task condition — optimised R(x) fit (single panel)
+%   Task EDA with R(x) fit at optimal onset lag
 %
 % NOTE ON CENTERING:
 %   Unlike respiration (ARU), EDA is not participant-mean-centered before
@@ -31,9 +29,9 @@
 %
 % INPUT:  ../../data/EDA/EDA_Task_Preprocessed.csv
 %         ../../data/EDA/EDA_Rest_Preprocessed.csv
-% OUTPUT: ../../results/Fig1_EDA_Rest.png
-%         ../../results/Fig2_EDA_OnsetLag.png
-%         ../../results/Fig3_EDA_Task.png (all 600 dpi)
+% OUTPUT: ../../results/Fig5_EDA_Rest.png
+%         ../../results/FigSI_EDA_OnsetLag.png
+%         ../../results/Fig6_EDA_Task.png (all 600 dpi)
 % =========================================================================
 
 %% Parameters

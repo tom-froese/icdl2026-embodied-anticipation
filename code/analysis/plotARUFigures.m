@@ -1,12 +1,11 @@
 %% plotARUFigures.m
 % =========================================================================
-% Grand Average Respiration: 3-Panel Vertical Stack
+% Grand Average Respiration: 2-Panel Vertical Stack
 % =========================================================================
 %
 % Panels:
 %   A. Rest grand average -ARU with smoothed trend
 %   B. Task grand average -ARU with S(x) fit (variable lag time)
-%   C. Task residuals (smoothed trend minus S(x) fit, full trial)
 %
 % S(x) model with offset (lambda = e, fixed horizon):
 %   f(x) = A0 * e * x * exp(-e * x) + B
@@ -17,7 +16,7 @@
 %
 % Lambda = e (fixed). Only A0 and B are free parameters.
 % The optimal lag time t0 is found by grid search (0.1s resolution)
-% over [1, 10] seconds, selecting the t0 that maximises R².
+% over [0, 15] seconds, selecting the t0 that maximises R².
 %
 % =========================================================================
 

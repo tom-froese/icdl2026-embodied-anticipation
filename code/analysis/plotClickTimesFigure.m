@@ -25,10 +25,9 @@
 % Panels:
 %   A. Click-time histogram with KDE overlay and best-fit S(x) curve
 %   B. R^2 as a function of onset lag (with plateau analysis)
-%   C. Residuals  (KDE - model)  with zero crossings
 %
 % INPUT:  ../../data/ClickTimes/ClickResponseTimes.csv
-% OUTPUT: ../../results/Fig_ClickTimes.png (300 dpi)
+% OUTPUT: ../../results/Fig4_ClickTimes.png (300 dpi)
 %
 % AUTHOR: Embodied Cognitive Science Unit, OIST
 % DATE:   February 2026
