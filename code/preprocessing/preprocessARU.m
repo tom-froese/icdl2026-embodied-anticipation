@@ -144,7 +144,7 @@ for f = 1:length(folders)
         
         % ----- TASK TRIALS -----
         for t = 1:num_trials
-            filename = fullfile(folder_name, ...
+            filename = fullfile(folders(f).folder, folder_name, ...
                 sprintf('pce%s_%s_Trial%d.mat', exp_num_str, participant_id, t));
             
             if ~isfile(filename)
@@ -223,7 +223,7 @@ for f = 1:length(folders)
         
         % ----- REST PERIODS -----
         for r = 1:num_rests
-            filename = fullfile(folder_name, ...
+            filename = fullfile(folders(f).folder, folder_name, ...
                 sprintf('pce%s_%s_Rest%d.mat', exp_num_str, participant_id, r));
             
             if ~isfile(filename)
