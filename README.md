@@ -146,7 +146,7 @@ If you use this code or data, please cite:
 
 ## Follow-up work
 
-An extended analysis exploring EEG global scalp potential, haptic contact, and perceptual awareness (PAS) sensitivity dynamics was originally planned as a separate IEEE TCDS journal paper. That journal extension did not materialize. The line of work is **superseded by, and carried forward in, a paper in preparation for *PNAS Nexus*** (Special Feature *"Culture and Artificial Intelligence"*), which develops an enactive account of distributed autonomy in a federated human–AI system. That paper is not yet submitted, so no citation details are available; its working home is the `enso-distributed-autonomy` loop in the author's `pi-studies` workspace.
+An extended analysis exploring EEG global scalp potential, haptic contact, and perceptual awareness (PAS) sensitivity dynamics was originally planned as a separate IEEE TCDS journal paper. That journal extension did not materialize. The line of work is **superseded by, and carried forward in, the companion paper "Clock-free optimal stopping in decision-making: Stochastic sensitivity dynamics predict behavioral, neural, and perceptual transition timing"** (Froese; in preparation for *PNAS Nexus*), which extends the same 1/*e* rate-sensitivity account across click times, electrodermal activity, global scalp potential, and PAS ratings. Its code and data live in the [pce-sensitivity-dynamics](https://github.com/tom-froese/pce-sensitivity-dynamics) repository; no citation details are available yet as the paper is unpublished.
 
 The exploratory EEG scripts and raw EEG data from the superseded extension remain parked locally alongside this repository as legacy material (git-ignored, not part of this reproduction artifact).
 
