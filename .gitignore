@@ -1,0 +1,30 @@
+# ICDL 2026 accepted-paper reproduction artifact — keep the tree limited to the paper's
+# repro package (EDA + respiration + click-time analysis; see README). The items below are
+# EXTRANEOUS to the accepted paper and are ignored so they can't be accidentally committed.
+# They are LEFT ON DISK (untracked) — nothing here deletes or moves them; physical relocation
+# is Tom's call.
+#
+# NOTE: .gitignore has no inline comments — every pattern is on its own bare line.
+
+# macOS cruft
+.DS_Store
+
+# --- Extraneous EEG / future IEEE-TCDS-journal-extension material (the paper does not use EEG) ---
+# ~1.6 GB raw/preprocessed EEG — never belongs in a code+preprocessed-data artifact:
+data/EEG/
+# zipped ARU archive (the paper ships the uncompressed ARU_*.csv/.json, which stay tracked):
+data/ARU/*.zip
+# MATLAB data caches (only the EEG timecourse .mat files exist; no paper .mat is tracked):
+*.mat
+# EEG-derived figures + caches (eeg_roi_*, eeg_timecourse*) — not paper figures:
+results/eeg_*
+
+# --- Extraneous CODE (EEG analysis + a journal-extension git helper) ---
+# NOTE: these are source files with NO git backup once ignored — flagged for Tom to home in a
+# separate/EEG repo (README already routes the EEG extended analysis to pce-sensitivity-dynamics).
+code/analysis/plotEEGTimeCourse.m
+code/analysis/plotEEGTimeCourse_clickless.m
+code/analysis/regressARUfromEEG.m
+code/preprocessing/preprocessEEGchannels.m
+# helper scaffolding for the planned IEEE TCDS journal extension, not the poster:
+git-workflow.sh
