@@ -144,9 +144,11 @@ If you use this code or data, please cite:
 }
 ```
 
-## Related Repositories
+## Follow-up work
 
-For the extended analysis including EEG global scalp potential, haptic contact, and perceptual awareness (PAS) sensitivity dynamics, see [pce-sensitivity-dynamics](https://github.com/tom-froese/pce-sensitivity-dynamics).
+An extended analysis exploring EEG global scalp potential, haptic contact, and perceptual awareness (PAS) sensitivity dynamics was originally planned as a separate IEEE TCDS journal paper. That journal extension did not materialize. The line of work is **superseded by, and carried forward in, a paper in preparation for *PNAS Nexus*** (Special Feature *"Culture and Artificial Intelligence"*), which develops an enactive account of distributed autonomy in a federated human–AI system. That paper is not yet submitted, so no citation details are available; its working home is the `enso-distributed-autonomy` loop in the author's `pi-studies` workspace.
+
+The exploratory EEG scripts and raw EEG data from the superseded extension remain parked locally alongside this repository as legacy material (git-ignored, not part of this reproduction artifact).
 
 ## License
 
